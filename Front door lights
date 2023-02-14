@@ -1,0 +1,23 @@
+# Set up automation for frontdoor lights turning on when Ubiquiti G4 doorbell detects motion and it is dark outside
+alias: 'Frontdoor Light on when G4 Doorbell detects motion and it is dark outside'
+trigger:
+  - platform: state
+    entity_id: switch.<your-Shelly1-entity-id>
+    to: 'on'
+  - platform: state
+    entity_id: binary_sensor.ubiquiti_g4_motion_detection
+    to: 'on'
+condition:
+  - condition: state
+    entity_id: binary_sensor.ubiquiti_g4_dark_detection
+    state: 'on'
+action:
+  - service: homeassistant.turn_on
+    target:
+      entity_id: switch.<your-front-door-light-entity-id>
+  - delay: '00:02:00'
+  - condition: template
+    value_template: '{{ is_state("switch.<your-Shelly1-entity-id>", "off") }}'
+  - service: homeassistant.turn_off
+    target:
+      entity_id: switch.<your-front-door-light-entity-id>
